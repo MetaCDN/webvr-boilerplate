@@ -30,7 +30,7 @@ function ButtonManager(opt_root) {
   fsButton.src = this.ICONS.fullscreen;
   fsButton.title = 'Fullscreen mode';
   var s = fsButton.style;
-  s.bottom = 0;
+  s.top = 0;
   s.right = 0;
   fsButton.addEventListener('click', this.createClickHandler_('fs'));
   root.appendChild(fsButton);
@@ -41,7 +41,7 @@ function ButtonManager(opt_root) {
   vrButton.src = this.ICONS.cardboard;
   vrButton.title = 'Virtual reality mode';
   var s = vrButton.style;
-  s.bottom = 0;
+  s.top = 0;
   s.right = '48px';
   vrButton.addEventListener('click', this.createClickHandler_('vr'));
   root.appendChild(vrButton);
