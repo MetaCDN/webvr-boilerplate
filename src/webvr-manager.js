@@ -56,7 +56,9 @@ function WebVRManager(renderer, effect, params) {
 
     // Only enable VR mode if there's a VR device attached or we are running the
     // polyfill on mobile.
-    this.isVRCompatible =  !hmd.isPolyfilled || Util.isMobile();
+    if (!this.isVRCompatibleOverride) {
+      this.isVRCompatible =  !hmd.isPolyfilled || Util.isMobile();
+    }
 
     switch (this.startMode) {
       case Modes.MAGIC_WINDOW:
@@ -97,6 +99,23 @@ WebVRManager.prototype = new Emitter();
 // Expose these values externally.
 WebVRManager.Modes = Modes;
 
+WebVRManager.prototype.render = function(scene, camera, timestamp) {
+  // Scene may be an array of two scenes, one for each eye.
+  if (scene instanceof Array) {
+    this.effect.render(scene[0], camera);
+  } else {
+    this.effect.render(scene, camera);
+  }
+};
+
+WebVRManager.prototype.setVRCompatibleOverride = function(isVRCompatible) {
+  this.isVRCompatible = isVRCompatible;
+  this.isVRCompatibleOverride = true;
+
+  // Don't actually change modes, just update the buttons.
+  this.button.setMode(this.mode, this.isVRCompatible);
+};
+
 /**
  * Promise returns true if there is at least one HMD device available.
  */
@@ -118,15 +137,6 @@ WebVRManager.prototype.getDeviceByType_ = function(type) {
   });
 };
 
-WebVRManager.prototype.render = function(scene, camera, timestamp) {
-  // Scene may be an array of two scenes, one for each eye.
-  if (scene instanceof Array) {
-    this.effect.render(scene[0], camera);
-  } else {
-    this.effect.render(scene, camera);
-  }
-};
-
 /**
  * Helper for entering VR mode.
  */
@@ -143,7 +153,7 @@ WebVRManager.prototype.setMode_ = function(mode) {
     console.warn('Not changing modes, already in %s', mode);
     return;
   }
-  console.log('Mode change: %s => %s', this.mode, mode);
+  // console.log('Mode change: %s => %s', this.mode, mode);
   this.mode = mode;
   this.button.setMode(mode, this.isVRCompatible);
 
